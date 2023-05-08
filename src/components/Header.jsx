@@ -50,17 +50,17 @@ const Header = () => {
                     >
                       CourseVideo
                     </Link> */}
-                    <Link
+                    {/* <Link
                       to="/vector"
                       className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                     >
                       Incourse
-                    </Link>
+                    </Link> */}
                     <Link
                       to="/courseAvailable"
                       className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                     >
-                      Course
+                      My Programs
                     </Link>
                     <Link
                       to="/youtube"
