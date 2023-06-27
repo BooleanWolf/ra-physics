@@ -30,7 +30,7 @@ const CardSlider = () => {
         <div className="p-2">
           <ReactPlayer
             controls
-            url="https://www.youtube.com/watch?v=a0VXhGOC4CE"
+            url="https://youtu.be/-zj1JPQcLpg"
             width="100%"
             height=" 350px"
           />

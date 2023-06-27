@@ -1,13 +1,43 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { AuthContext } from "./Provider/Provider";
+import Swal from "sweetalert2";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+  const { user, logOut } = useContext(AuthContext);
+
+  const handleLogOut = () => {
+    logOut()
+      .then(() => {
+        Swal.fire({
+          title: "LogOut Successful",
+          showClass: {
+            popup: "animate__animated animate__fadeInDown",
+          },
+          hideClass: {
+            popup: "animate__animated animate__fadeOutUp",
+          },
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    fetch("https://physics-server.vercel.app/users")
+      .then((res) => res.json())
+      .then((data) => setAllUsers(data));
+  }, []);
+
+  const useAdmin = allUsers.find((n) => n?.email == user?.email);
 
   return (
     <nav className="bg-gray-800  ">
@@ -16,8 +46,8 @@ const Header = () => {
           <div className="max-w-8xl mx-auto    sm:px-6 lg:px-20 ">
             <div className="flex items-center justify-between h-20">
               <div className="flex items-center">
-                <Link className="flex-shrink-0">
-                  <img className="h-8 w-8" src={logo} alt="Logo" />
+                <Link className="flex-shrink-0 ">
+                  <img className=" h-8 w-8" src={logo} alt="Logo" />
                 </Link>
                 <Link className="flex-shrink-0">
                   <h2 className="text-white px-3 py-2 rounded-md text-sm font-medium">
@@ -32,12 +62,16 @@ const Header = () => {
                     >
                       Home
                     </Link>
-                    {/* <Link
-                      to="/course"
-                      className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Dashboard
-                    </Link> */}
+                    {useAdmin?.role == "admin" ? (
+                      <Link
+                        to="/allUser"
+                        className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                      >
+                        AllUsers
+                      </Link>
+                    ) : (
+                      ""
+                    )}
                     {/* <Link
                       to="/demolecture"
                       className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
@@ -50,12 +84,12 @@ const Header = () => {
                     >
                       CourseVideo
                     </Link> */}
-                    {/* <Link
+                    <Link
                       to="/vector"
                       className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                     >
                       Incourse
-                    </Link> */}
+                    </Link>
                     <Link
                       to="/courseAvailable"
                       className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
@@ -108,22 +142,47 @@ const Header = () => {
           </div>
         </div>
         <div className=" lg:flex items-center hidden lg:visible me-20">
-          <div>
-            <Link
-              to="/login"
-              className=" text-white  px-3 py-2 rounded-md text-sm font-medium"
-            >
-              <button className="btn btn-outline btn-info">Login</button>
-            </Link>
+          <div className="text-white me-3 my-1">
+            {user ? (
+              <div className="flex gap-2">
+                <p>Hi,</p>
+                {user.displayName}
+                <img
+                  className="rounded-full h-8 w-8"
+                  src={user.photoURL}
+                  alt=""
+                />
+              </div>
+            ) : (
+              ""
+            )}
           </div>
-
           <div>
-            <Link
-              to="/register"
-              className="  text-white  px-3 py-2 rounded-md text-sm font-medium"
-            >
-              <button className="btn btn-outline btn-info">Register</button>
-            </Link>
+            {user?.email ? (
+              <button
+                onClick={handleLogOut}
+                className=" bg-green-300  px-4 py-2 rounded hover:bg-green-200 mr-2"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link to="/login">
+                <button className="bg-green-300  px-4 py-2 rounded hover:bg-green-200 mr-2">
+                  Login
+                </button>
+              </Link>
+            )}
+          </div>
+          <div>
+            {user?.email ? (
+              ""
+            ) : (
+              <Link to="/register">
+                <button className="bg-green-300   px-4 py-2 rounded hover:bg-green-200">
+                  Register
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -137,12 +196,12 @@ const Header = () => {
             Home
           </Link>
           <Link
-            to="/course"
+            to="/allUser"
             className="block px-3 py-2 rounded-md text-base font-medium text-white bg-gray-900 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out"
           >
             Dashboard
           </Link>
-          <Link
+          {/* <Link
             to="/demolecture"
             className="block px-3 py-2 rounded-md text-base font-medium text-white bg-gray-900 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out"
           >
@@ -153,7 +212,7 @@ const Header = () => {
             className="block px-3 py-2 rounded-md text-base font-medium text-white bg-gray-900 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out"
           >
             CourseVideo
-          </Link>
+          </Link> */}
           <Link
             to="/vector"
             className="block px-3 py-2 rounded-md text-base font-medium text-white bg-gray-900 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out"
@@ -164,7 +223,7 @@ const Header = () => {
             to="/courseAvailable"
             className="block px-3 py-2 rounded-md text-base font-medium text-white bg-gray-900 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out"
           >
-            Course
+            My Programs
           </Link>
           <Link
             to="/youtube"
@@ -173,18 +232,44 @@ const Header = () => {
             YouTube
           </Link>
 
-          <Link
-            to="/login"
-            className="mt-1 block px-3 py-2 rounded-md text-base font-medium transition duration-150 ease-in-out"
-          >
-            <button className="btn btn-info">Login</button>
-          </Link>
-          <Link
-            to="/register"
-            className="mt-1 block px-3 py-2 rounded-md text-base font-medium transition duration-150 ease-in-out"
-          >
-            <button className="btn btn-info">Register</button>
-          </Link>
+          <div className="text-white">
+            {user ? (
+              <div className="my-2 flex gap-2">
+                <p>Hi,</p>
+                {user.displayName}
+                <img
+                  className=" rounded-full h-8 w-8"
+                  src={user.photoURL}
+                  alt=""
+                />
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+          {user?.email ? (
+            <button
+              onClick={handleLogOut}
+              className=" bg-green-300  px-4 py-2 rounded hover:bg-green-200 mr-2"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to="/login">
+              <button className="bg-green-300  px-4 py-2 rounded hover:bg-green-200 mr-2">
+                Login
+              </button>
+            </Link>
+          )}
+          {user?.email ? (
+            ""
+          ) : (
+            <Link to="/register">
+              <button className="bg-green-300   px-4 py-2 rounded hover:bg-green-200">
+                Register
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </nav>

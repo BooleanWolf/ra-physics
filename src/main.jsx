@@ -15,11 +15,15 @@ import Vector from "./components/Vector.jsx";
 import Lecture from "./components/Lecture.jsx";
 import DemoLecture from "./components/DemoLecture.jsx";
 import YouTube from "./components/YouTube.jsx";
+import AuthProvider from "./components/Provider/Provider.jsx";
+import PrivateRoute from "./components/Private/PrivateRoute.jsx";
+import AllUsers from "./components/AllUsers/AllUsers.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App></App>,
+    errorElement: <Error></Error>,
     children: [
       {
         path: "/",
@@ -44,11 +48,17 @@ const router = createBrowserRouter([
       },
       {
         path: "/courseAvailable",
-        element: <CourseAvailable></CourseAvailable>,
+        element: (
+          <PrivateRoute>
+            <CourseAvailable></CourseAvailable>
+          </PrivateRoute>
+        ),
+        // loader: () => fetch("courses.json"),
       },
       {
-        path: "/courseInfo",
+        path: "/courseInfo/:id",
         element: <CourseInfo></CourseInfo>,
+        loader: ({ params }) => fetch(`/courses.json/${params.id}`),
       },
       {
         path: "/vector",
@@ -62,12 +72,22 @@ const router = createBrowserRouter([
         path: "/youtube",
         element: <YouTube></YouTube>,
       },
+      {
+        path: "/allUser",
+        element: (
+          <PrivateRoute>
+            <AllUsers></AllUsers>
+          </PrivateRoute>
+        ),
+      },
     ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
 );
